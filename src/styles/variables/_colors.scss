@@ -1,0 +1,47 @@
+//====COMMON COLOR=====//
+$gray-background-canvas: #F4F4F4 !default;
+$white: #FFFFFF !default;
+$text-white: #FFFFFFDE !default;
+$black: #000000 !default;
+$green: #42b883 !default;
+$gray-text: #94A3B8 !default;
+$gray-text-normal: #EBEBEB99 !default;
+$bg-dark: #1A1A1A !default;
+$bg-dark-lighter: #242424 !default;
+
+//=====DARK THEME=====//
+// $dark-base-color: #1E2938 !default;
+$dark-base-color: #252627B3 !default;
+$dark-blue: #200E3A !default;
+$dark-purple: #3C0753 !default;
+$normal-purple: #720455 !default;
+$normal-blue: #3887BE !default;
+$light-blue: #52D3D8 !default;
+$light-green: #42b883 !default;
+$text-blue: #7DD3FC;
+$text-green: #42b883;
+$button-text-light: #AAC8E4;
+$button-text-dark: #AAC8E4;
+
+$dark-theme: (
+  dark-blue: #200E3A,
+  dark-purple: #3C0753,
+  normal-purple: #720455,
+  $normal-blue: #3887BE,
+  light-blue: #52D3D8,
+) !default;
+
+//=====LIGHT THEME =====//
+$bold-pink: #f14c8e !default;
+$light-pink: #FFE6E6 !default;
+$normal-pink: #F2D1D1 !default;
+$shade-blue: #DAEAF1 !default;
+$normal-shade-blue: #C6DCE4 !default;
+
+$light-theme: (
+  bold-pink: #F875AA,
+  light-pink: #FFE6E6,
+  normal-pink: #F2D1D1,
+  normal-shade-blue: #C6DCE4,
+  shade-blue: #DAEAF1,
+)

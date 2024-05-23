@@ -1,0 +1,37 @@
+h1 {
+  font-size: 40px;
+  font-weight: bold;
+  color: $gray-text-normal;
+  &:hover {
+    color: white;
+  }
+}
+h1.title {
+  position: relative;
+  font-weight: bold;
+  background: linear-gradient(315deg, #42d392 25%, #647eff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 36px;
+  font-weight: bold;
+  &::after {
+    position: absolute;
+    content: '';
+    width: 50%;
+    height: 4px;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    margin: auto;
+    background-color: $text-green;
+  }
+  &--none-border {
+    &::after {
+      content: none !important;
+    }
+  }
+}
+h2 {
+  font-size: 20px;
+}
