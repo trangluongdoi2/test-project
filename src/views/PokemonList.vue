@@ -1,16 +1,9 @@
 <template>
   <div class="container">
-    <PokemonFilters @change-filters="updateFilters($event as any)"/>
-    <div class="test">
-      <PokemonFilterBySearch 
-        v-for="field in Object.keys(pokemonFilterParamsMap)" 
-        :key="field"
-        :field="field"
-        :label="pokemonFilterParamsMap[field]"
-        @change-filters="updateFiltersBySearch(field, $event as any)"
-      />
-    </div>
-    <!-- <AppSort :listFields="listFields" @change-sort="handleSort($event as any)"/> -->
+    <PokemonFilterSidebar 
+      @update-filters="updateFilters($event as any)"
+      @update-filters-by-search="updateFiltersBySearch($event as any)"
+    />
     <div class="pokemon-list__container">
     <AppLoading class="loading" v-if="isFetching" />
     <div class="pokemon-list" v-if="pokemonItems?.length">
@@ -23,7 +16,7 @@
         @sort-item="handleSort($event as any)"
       />
     </div>
-    <div v-else>No Pokemon</div>
+    <div v-else-if="!isFetching && !pokemonItems?.length">No Pokemon</div>
     </div>
   </div>
   <PokemonDownloadSpriteModal
@@ -50,8 +43,8 @@ import PokemonFilterBySearch from '@/pokemon/components/PokemonFilterBySearch.vu
 import PokemonFilters from '@/pokemon/components/PokemonFilters.vue';
 import PokemonItemsTable from '@/pokemon/components/PokemonItemsTable.vue';
 import { pokemonQuery } from '@/pokemon/composables/useQueryPokemon';
-import { ListFieldSort } from '@/type';
 import { onMounted, ref, watch } from 'vue';
+import PokemonFilterSidebar from '@/views/PokemonFilterSidebar.vue';
 
 export type QueryConfigs = {
   pageNumber: number | undefined,
@@ -70,6 +63,7 @@ export default {
     PokemonDownloadSpriteModal,
     PokemonFilterBySearch,
     PokemonItemsTable,
+    PokemonFilterSidebar,
   },
   setup() {
     const {
@@ -129,40 +123,6 @@ export default {
       refetch: refetchPokemonTypes,
     } = useQueryPokemonTypes();
 
-    // const listFields: ListFieldSort[] = [
-    //   {
-    //     field: 'number',
-    //     direction: 'desc',
-    //   },
-    //   {
-    //     field: 'total',
-    //     direction: 'desc',
-    //   },
-    //   {
-    //     field: 'hp',
-    //     direction: 'desc',
-    //   },
-    //   {
-    //     field: 'attack',
-    //     direction: 'desc',
-    //   },
-    //   {
-    //     field: 'defense',
-    //     direction: 'desc',
-    //   },
-    //   {
-    //     field: 'sp_atk',
-    //     direction: 'desc',
-    //   }, {
-    //     field: 'sp_def',
-    //     direction: 'desc',
-    //   },
-    //   {
-    //     field: 'speed',
-    //     direction: 'desc',
-    //   },
-    // ];
-
     const showPokemonDownloadSpriteModal = () => {
       isShowPokemonDetailsModal.value = true;
     }
@@ -199,7 +159,8 @@ export default {
       currentQueryFilters.value = dataArr.join('&');
     }
 
-    const updateFiltersBySearch = (field: string, data: { enabled: boolean, value: string }) => {
+    const updateFiltersBySearch = (input: { field: string, data: { enabled: boolean, value: string } }) => {
+      const { field, data } = input;
       if (data.enabled && data.value) {
         filterBySearchMap.value.set(field, data.value);
       } else {
@@ -254,7 +215,6 @@ export default {
   height: 100vh;
   overflow: hidden;
   display: flex;
-  flex-direction: column;
 }
 .pokemon-list__container {
   flex: 1 1 0;
@@ -262,19 +222,13 @@ export default {
   align-items: center;
   justify-content: center;
   .pokemon-list {
-    background-color: #f4f4f4;
+    background-color: $dark-base-color;
     height: 100%;
-    padding: 10px;
+    padding: 20px;
     .loading {
       width: 100%;
       height: 100%;
     }
   }
-}
-.test {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin: 10px 0 10px 0;
-  gap: 10px;
 }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class="pokemon-filters">
-    <app-button class="filters-button" @click="onShowPokemonFilterModal">Filters</app-button>
+    <!-- <app-button class="filters-button" @click="onShowPokemonFilterModal">Filters</app-button> -->
+    <div class="filters-title">Filter</div>
     <AppSelect v-model:value="currentSelectedGeneration" @change="onChangeGeneration">
       <option class="option-default" :value="undefined">Select Generation...</option>
       <option
@@ -165,12 +166,30 @@ export default {
 
 <style lang="scss" scoped>
 .pokemon-filters {
-  height: 60px;
+  flex: 1 1 0;
+  padding: 10px;
+  min-height: 200px;
+  width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
+  position: relative;
+  justify-content: space-between;
+  &::after {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    background-color: $green;
+  }
+  .filters-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+  }
   .filters-button {
     height: 30px;
   }

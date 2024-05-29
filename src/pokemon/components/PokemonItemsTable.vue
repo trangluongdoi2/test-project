@@ -7,11 +7,13 @@
       @select-item="$emit('select-item', $event)"
       @sort-table="onSortTable"
     >
+      <template v-slot:name="{ item }">
+        <div class="pokemon-name">
+          {{ item.name }}
+        </div>
+      </template>
       <template v-slot:id="{ item }">
         {{ item.id }}
-      </template>
-      <template v-slot:name="{ item }">
-        {{ item.name }}
       </template>
       <template v-slot:number="{ item }">
         {{ item.number }}
@@ -26,7 +28,9 @@
         {{ item.total }}
       </template>
       <template v-slot:hp="{ item }">
-        {{ item.hp }}
+        <div class="pokemon-hp">
+          {{ item.hp }}
+        </div>
       </template>
       <template v-slot:attack="{ item }">
         {{ item.attack }}
@@ -44,8 +48,6 @@
         {{ item.speed }}
       </template>
     </AppTable>
-  </div>
-  <div class="test-container">
   </div>
 </template>
 
@@ -71,19 +73,18 @@ export default {
   setup(props: any, { emit }: SetupContext) {
     const headerColumns: HeaderColumns[] = [
       {
+        field: 'name',
+        header: 'Name',
+      },
+      {
         field: 'id',
         header: 'ID',
-        width: 100,
+        width: 200,
       },
       {
         field: 'number',
         header: 'Number',
         width: 100,
-        sortable: true,
-      },
-      {
-        field: 'name',
-        header: 'Name',
         sortable: true,
       },
       {
@@ -160,5 +161,12 @@ export default {
 .table-wrapper {
   overflow: auto;
   max-height: 100%;
+  .pokemon-name {
+    font-weight: bold;
+    font-style: italic;
+  }
+  .pokemon-hp {
+    color: red;
+  }
 }
 </style>

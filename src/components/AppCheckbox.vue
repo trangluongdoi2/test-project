@@ -1,6 +1,6 @@
 <template>
   <label class="wrapper">
-    {{ label }}
+    <span class="label-text"> {{ label }}</span>
     <input class="checkbox" type="checkbox" v-model="isChecked" @change="updateInput"/>
     <span class="checkmark"></span>
   </label>
@@ -66,12 +66,15 @@ export default {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  font-size: 16px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  .label-text {
+    text-overflow: ellipsis;
+    word-break: break-all;
+  }
 }
-/* Hide the browser's default checkbox */
 .wrapper input {
   position: absolute;
   opacity: 0;
@@ -79,11 +82,11 @@ export default {
   height: 0;
   width: 0;
 }
-/* Create a custom checkbox */
 .checkmark {
   position: absolute;
-  top: 0;
   left: 0;
+  top: 50%;
+  transform: translate(0, -50%);
   width: 20px;
   height: 20px;
   border-radius: 2px;
@@ -93,30 +96,25 @@ export default {
   align-items: center;
   justify-content: center;
 }
-/* On mouse-over, add a grey background color */
 .wrapper:hover input ~ .checkmark {
   background-color: #ccc;
 }
-/* When the checkbox is checked, add a blue background */
 .wrapper input:checked ~ .checkmark {
-  background-color: #1CD4A7;
+  background-color: #1677ff;
 }
-/* Create the checkmark/indicator (hidden when not checked) */
 .checkmark:after {
   content: "";
   position: absolute;
   display: none;
 }
-/* Show the checkmark when checked */
 .wrapper input:checked ~ .checkmark:after {
   display: block;
 }
-/* Style the checkmark/indicator */
 .wrapper .checkmark:after {
-  left: 7px;
-  top: 0px;
+  left: 6px;
+  top: 1px;
   width: 4px;
-  height: 12px;
+  height: 10px;
   border: solid white;
   border-width: 0 3px 3px 0;
   -webkit-transform: rotate(45deg);

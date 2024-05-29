@@ -66,7 +66,9 @@ input[type=number]::-webkit-inner-spin-button {
 
 .search-container {
   display: block;
-  width: 350px;
+  // width: 350px;
+  max-width: 300px;
+  max-height: 30px;
   background-size: 15px 15px;
   font-size: 16px;
   border: none;
@@ -75,8 +77,11 @@ input[type=number]::-webkit-inner-spin-button {
   rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
   position: relative;
   &--disabled {
-    opacity: 0.5;
+    opacity: 0.8;
     pointer-events: none;
+    &:hover {
+      cursor: not-allowed !important;
+    }
   }
   .search-input {
     border: none;
