@@ -1,5 +1,5 @@
 <template>
-  <select v-model="selectedValue" @change="handleChange">
+  <select class="select-container" v-model="selectedValue" @change="handleChange">
     <slot></slot>
   </select>
 </template>
@@ -9,14 +9,13 @@ import { useModelWrapper } from '@/composables/useModelWrapper';
 import { SetupContext } from 'vue';
 
 export type Props = {
-  value: string | number,
+  value?: string | number,
 }
 export default {
-  emits: ['update:value'],
+  emits: ['update:value', 'change'],
   props: {
     value: {
       type: [String, Number],
-      required: true,
     },
   },
   setup(props: Props, { emit }: SetupContext) {
@@ -24,6 +23,7 @@ export default {
     const handleChange = (event: Event) => {
       const { value } = event.target as any;
       selectedValue.value = value;
+      emit('change', selectedValue.value);
     }
 
     return {
@@ -36,6 +36,8 @@ export default {
 
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.select-container {
+  height: 30px;
+}
 </style>

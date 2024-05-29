@@ -1,10 +1,4 @@
-import {
-  Directive,
-  DirectiveBinding,
-  VNode,
-  createApp,
-  h,
-} from 'vue';
+import {  createApp, h } from 'vue';
 import { onClickOutSide } from './directives/onClickOutSide';
 import AppIcon from './components/AppIcon.vue';
 import AppButton from './components/AppButton.vue';

@@ -11,4 +11,3 @@ export function capitalize(string: string, firstLetterOnly: boolean): string {
 export function toPascalCase(string: string): string {
   return camelize(capitalize(string, false));
 }
-

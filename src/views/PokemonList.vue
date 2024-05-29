@@ -1,127 +1,280 @@
 <template>
-  <div>
-    <app-button @click="showPokemonDownloadSpriteModal">Click me!</app-button>
-    <AppSelect v-model:value="currentSelect">
-      <option value="">Select an option...</option>
-      <option value="option1">Option 1</option>
-      <option value="option2">Option 2</option>
-      <option value="option3">Option 3</option>
-    </AppSelect>
-    <AppSort :listFields="listFields" @change-sort="handleSort($event as any)"/>
-    <AppLoading v-if="true"/>
-    <div class="pokemon-list" v-if="listItems?.length">
-      <PokemonCard
-        v-for="(item, index) in listItems" :key="index"
-        :item="item"
-      >
-      </PokemonCard>
+  <div class="container">
+    <PokemonFilters @change-filters="updateFilters($event as any)"/>
+    <div class="test">
+      <PokemonFilterBySearch 
+        v-for="field in Object.keys(pokemonFilterParamsMap)" 
+        :key="field"
+        :field="field"
+        :label="pokemonFilterParamsMap[field]"
+        @change-filters="updateFiltersBySearch(field, $event as any)"
+      />
+    </div>
+    <!-- <AppSort :listFields="listFields" @change-sort="handleSort($event as any)"/> -->
+    <div class="pokemon-list__container">
+    <AppLoading class="loading" v-if="isFetching" />
+    <div class="pokemon-list" v-if="pokemonItems?.length">
+      <PokemonItemsTable
+        v-if="pokemonItems?.length" 
+        :items="pokemonItems"
+        :sortField="sortField"
+
+        @select-item="onShowDetail($event as any)"
+        @sort-item="handleSort($event as any)"
+      />
+    </div>
+    <div v-else>No Pokemon</div>
     </div>
   </div>
-  <AppModal
+  <PokemonDownloadSpriteModal
+    v-if="pokemonDetailsVal"
     v-model:visible="isShowPokemonDetailsModal"
+    :isLoading="isFetchingPokemonDetails"
     :width="'50%'"
-    :height="'50%'"
+    :item="pokemonDetailsVal"
+
+    @download-sprite="onDownloadSprite($event as string)"
   />
 </template>
 
 <script lang="ts">
-import { onMounted, ref, watch } from 'vue';
-import { PokemonItem } from '@/pokemon/api/type';
-import { pokemonQuery } from '@/pokemon/composables/useQueryPokemon';
-import PokemonCard from '@/pokemon/components/PokemonCard.vue';
+import { pokemonFilterParamsMap } from '@/common/constant';
 import AppLoading from '@/components/AppLoading.vue';
 import AppModal from '@/components/AppModal.vue';
-import AppButton from '@/components/AppButton.vue';
-import AppSelect from '@/components/AppSelect.vue';
 import AppSort from '@/components/AppSort.vue';
+import { SortField } from '@/components/AppTable.vue';
+import { PokemonDetails, PokemonItem } from '@/pokemon/api/type';
+import PokemonCard from '@/pokemon/components/PokemonCard.vue';
+import PokemonDownloadSpriteModal from '@/pokemon/components/PokemonDownloadSpriteModal.vue';
+import PokemonFilterBySearch from '@/pokemon/components/PokemonFilterBySearch.vue';
+import PokemonFilters from '@/pokemon/components/PokemonFilters.vue';
+import PokemonItemsTable from '@/pokemon/components/PokemonItemsTable.vue';
+import { pokemonQuery } from '@/pokemon/composables/useQueryPokemon';
 import { ListFieldSort } from '@/type';
+import { onMounted, ref, watch } from 'vue';
+
+export type QueryConfigs = {
+  pageNumber: number | undefined,
+  pageSize: number | undefined,
+  queryFilters: string,
+  querySort: string,
+}
 
 export default {
   components: {
     AppLoading,
     AppModal,
     PokemonCard,
-    AppSelect,
+    PokemonFilters,
     AppSort,
+    PokemonDownloadSpriteModal,
+    PokemonFilterBySearch,
+    PokemonItemsTable,
   },
   setup() {
-    const listItems = ref<PokemonItem[]>();
-    const { useQueryPokemonItem } = pokemonQuery;
+    const {
+      useQueryPokemonItems,
+      useQueryPokemonItemsTest,
+      useQueryPokemonDetails,
+      useQueryPokemonDownloadSprite,
+      useQueryPokemonTypes,
+    } = pokemonQuery;
     const sortInfos = ref<string>();
-    const { data: pokemonItems, isFetching, refetch } = useQueryPokemonItem();
+    const idPokemon = ref<string>('');
     const isShowPokemonDetailsModal = ref<boolean>(false);
-    const currentSelect = ref<string>('option1');
+    const pokemonDetails = ref<PokemonDetails>();
+    const currentQueryFilters = ref<string>('');
+    const currentQueryFiltersBySearch = ref<string>('');
+    const currentQuerySorts = ref<string>('');
+    const entireQueryFilters = ref<string>('');
+    const configQuery = ref<QueryConfigs>({
+      pageNumber: undefined,
+      pageSize: undefined,
+      queryFilters: '',
+      querySort: '',
+    });
+    const sortField = ref<SortField>({
+      field: 'number',
+      orderSort: 'desc',
+    });
 
-    const listFields: ListFieldSort[] = [
-      {
-        field: 'number',
-        direction: 'desc',
-      },
-      {
-        field: 'total',
-        direction: 'desc',
-      },
-      {
-        field: 'hp',
-        direction: 'desc',
-      },
-      {
-        field: 'attack',
-        direction: 'desc',
-      },
-      {
-        field: 'defense',
-        direction: 'desc',
-      },
-      {
-        field: 'sp_atk',
-        direction: 'desc',
-      }, {
-        field: 'sp_def',
-        direction: 'desc',
-      },
-      {
-        field: 'speed',
-        direction: 'desc',
-      },
-    ]
+    const filterBySearchMap = ref<Map<string, string>>(new Map());
+    
+    const {
+      data: pokemonItems,
+      isFetching,
+      refetch
+    } = useQueryPokemonItems(entireQueryFilters, currentQuerySorts);
+
+    const {
+      data: data1,
+      refetch: refetch1,
+    } = useQueryPokemonItemsTest(configQuery);
+
+    const {
+      data: pokemonDetailsVal,
+      isFetching: isFetchingPokemonDetails,
+      refetch: refetchPokemonDetails
+    }  = useQueryPokemonDetails(idPokemon);
+
+    const {
+      data: pokemonDownloadSprite,
+      isFetching: isFetchingPokemonDownloadSprite,
+      refetch: refetchPokemonDownloadSprite
+    }  = useQueryPokemonDownloadSprite(idPokemon);
+
+    const {
+      data: pokemonTypes,
+      isFetching: isFetchingPokemonTypes,
+      refetch: refetchPokemonTypes,
+    } = useQueryPokemonTypes();
+
+    // const listFields: ListFieldSort[] = [
+    //   {
+    //     field: 'number',
+    //     direction: 'desc',
+    //   },
+    //   {
+    //     field: 'total',
+    //     direction: 'desc',
+    //   },
+    //   {
+    //     field: 'hp',
+    //     direction: 'desc',
+    //   },
+    //   {
+    //     field: 'attack',
+    //     direction: 'desc',
+    //   },
+    //   {
+    //     field: 'defense',
+    //     direction: 'desc',
+    //   },
+    //   {
+    //     field: 'sp_atk',
+    //     direction: 'desc',
+    //   }, {
+    //     field: 'sp_def',
+    //     direction: 'desc',
+    //   },
+    //   {
+    //     field: 'speed',
+    //     direction: 'desc',
+    //   },
+    // ];
 
     const showPokemonDownloadSpriteModal = () => {
       isShowPokemonDetailsModal.value = true;
     }
 
-    const handleSort = (data: { field: string, dir: string }) => {
-      sortInfos.value = data.dir === 'desc' ? data.field : `-${data.field}`;
-      console.log(sortInfos.value, 'sortInfos.value..');
+    const handleSort = (data: SortField) => {
+      sortInfos.value = data.orderSort === 'desc' ? data.field : `-${data.field}`;
+      currentQuerySorts.value = `sort=${sortInfos.value}`;
+      sortField.value = data;
+    }
+
+    const onShowDetail = (data: PokemonItem) => {
+      isShowPokemonDetailsModal.value = true;
+      idPokemon.value = data.id;
+      refetchPokemonDetails();
+    }
+
+    const onDownloadSprite = (id: string) => {
+      idPokemon.value = id;
+      refetchPokemonDownloadSprite();
+      const aEl = document.createElement('a');
+      const URL_DOWNLOAD = `https://api.vandvietnam.com/api/pokemon-api/pokemons/${idPokemon.value}/sprite`;
+      aEl.id = `${idPokemon.value}-download`;
+      aEl.href = URL_DOWNLOAD;
+      document.body.appendChild(aEl);
+      aEl.click();
+      aEl.remove();
+    }
+
+    const updateFilters = (data: Map<string, string | number>) => {
+      const dataArr: string[] = [];
+      for (const [key, value] of data.entries()) {
+        dataArr.push(`filter[${key}]=${value}`);
+      }
+      currentQueryFilters.value = dataArr.join('&');
+    }
+
+    const updateFiltersBySearch = (field: string, data: { enabled: boolean, value: string }) => {
+      if (data.enabled && data.value) {
+        filterBySearchMap.value.set(field, data.value);
+      } else {
+        filterBySearchMap.value.delete(field);
+      }
+      const dataArr: string[] = [];
+      for (const [key, value] of filterBySearchMap.value.entries()) {
+        dataArr.push(`filter[${key}]=${value}`);
+      };
+      currentQueryFiltersBySearch.value = dataArr.join('&');
     }
 
     onMounted(() => {
+      // getDefaultConfigs();
+      refetch();
+      refetchPokemonTypes();
+    });
+
+
+    watch([currentQueryFilters, currentQueryFiltersBySearch], ([new1, new2]: [string, string]) => {
+      entireQueryFilters.value = (new1 ? new1 + '&' : '') + new2;
+    });
+
+    watch([currentQuerySorts, entireQueryFilters], ([newSorts, newFilters]: [string, string]) => {
       refetch();
     });
 
-    watch(pokemonItems, () => {
-      listItems.value = pokemonItems.value || [];
-    }, { immediate: true, deep: true });
-
     return {
-      listItems,
       isFetching,
       pokemonItems,
+      pokemonDetails,
       isShowPokemonDetailsModal,
-      currentSelect,
       handleSort,
-      listFields,
+      // listFields,
+      isFetchingPokemonDetails,
+      pokemonDetailsVal,
+      sortField,
 
       showPokemonDownloadSpriteModal,
+      onShowDetail,
+      onDownloadSprite,
+      updateFilters,
+      updateFiltersBySearch,
+      pokemonFilterParamsMap,
     }
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.pokemon-list {
-  background-color: red;
+.container {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.pokemon-list__container {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .pokemon-list {
+    background-color: #f4f4f4;
+    height: 100%;
+    padding: 10px;
+    .loading {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+.test {
   display: grid;
-  grid-template-columns: repeat(3, auto);
+  grid-template-columns: repeat(3, 1fr);
+  margin: 10px 0 10px 0;
+  gap: 10px;
 }
 </style>

@@ -1,10 +1,6 @@
 h1 {
   font-size: 40px;
   font-weight: bold;
-  color: $gray-text-normal;
-  &:hover {
-    color: white;
-  }
 }
 h1.title {
   position: relative;

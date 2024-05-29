@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <PokemonList />
-  </div>
+  <PokemonList />
 </template>
 <script lang="ts">
 import PokemonList from './views/PokemonList.vue';

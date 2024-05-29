@@ -5,11 +5,11 @@
         <div class="modal-container" ref="target">
           <div class="modal-header">
             <div class="header-actions">
+              <slot class="header-title" name="header"></slot>
               <app-button class="button-close" @click.stop="onCloseModal" >
                 <app-icon name="close" />
               </app-button>
             </div>
-            <slot name="header"></slot>
           </div>
           <div class="modal-body">
             <slot name="content">App Modal</slot>
@@ -53,6 +53,7 @@ export default {
   },
   emits: ['update:visible', 'close'],
   setup(props: Props, { emit }: SetupContext) {
+    const visibleVal = useModelWrapper(props, emit, 'visible');
     const widthVal = computed(() => {
       if (typeof props.width === 'string') {
         return props.width;
@@ -71,8 +72,6 @@ export default {
       return '80%';
     });
     
-    const visibleVal = useModelWrapper(props, emit, 'visible');
-
     const onCloseModal = () => {
       visibleVal.value = false;
       emit('close');
@@ -104,7 +103,7 @@ export default {
   background-color: rgba(0, 0, 0, 0.3);
   .modal-wrapper {
     width: v-bind(widthVal);
-    height: v-bind(heightVal);
+    // height: v-bind(heightVal);
     background-color: white;
     border-radius: 10px;
     .modal-container {
@@ -115,14 +114,20 @@ export default {
       flex-direction: column;
     }
     .modal-body {
-      flex: 1 1 0;
+      // flex: 1 1 0;
     }
     .modal-header {
       max-height: 60px;
       height: 60px;
+      // .header-title {
+      //   text-align: center;
+      // }
       .header-actions {
         height: 100%;
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         .button-close {
           width: 30px;
           min-height: 30px;
@@ -143,8 +148,5 @@ export default {
       justify-content: center;
     }
   }
-  // .button-close {
-  //   background-color: red;
-  // }
 }
 </style>

@@ -1,49 +1,120 @@
 import Api from "@/configs/api";
-import { PokemonClass, PokemonItem, PokemonType } from "./type";
+import { PokemonItem, PokemonType } from "./type";
+import { getBase64ImageFromUrl } from "@/common/file";
+import useLocalStorage from "../store/useLocalStorage";
+
+const { storage } = useLocalStorage();
 
 export default class PokemonApi extends Api {
-  async getPokemonItems() {
-    const URL = 'https://api.vandvietnam.com/api/pokemon-api/pokemons';
-    const [res1, res2] = await Promise.allSettled([this.get(URL), this.getPokemonByType()]);
-    if (res1.status === 'rejected') {
-      return [];
+  private  async useConvertedType(items: PokemonItem[]): Promise<PokemonItem[]> {
+    const types = await this.getPokemonByType();
+    const mapTypes: Map<number, string> = new Map();
+    for (let i = 0; i < types.length; i++) {
+      mapTypes.set(types[i].id, types[i].name);
     }
-    if (res1.status === 'fulfilled') {
-      let data = res1.value.data as PokemonItem[];
-      if (res2.status === 'rejected') {
-        return data;
-      }
-      const types = res2.value as PokemonType[];
-      const mapTypes: Map<number, string> = new Map();
-      for (let i = 0; i < types.length; i++) {
-        mapTypes.set(types[i].id, types[i].name);
-      }
-      // @ts-ignore
-      data = data.map((item: PokemonItem) => ({
-        ...item,
-        type_1: mapTypes.has(item?.type_1 as number) ? mapTypes.get(item.type_1 as number) ?? null : null,
-        type_2: mapTypes.has(item?.type_2 as number) ? mapTypes.get(item.type_2 as number) ?? null : null,
-      }));
-      return data;
+    const convertedItems = items.map((item: PokemonItem) => ({
+      ...item,
+      type_1: mapTypes.has(item?.type_1 as number) ? mapTypes.get(item.type_1 as number) ?? null : null,
+      type_2: mapTypes.has(item?.type_2 as number) ? mapTypes.get(item.type_2 as number) ?? null : null,
+    }));
+    return [...convertedItems as PokemonItem[]];
+  }
+
+  async getPokemonItems(filter: string = '', sort: string = '') {
+    let queryContent = !filter && !sort ? '' : '?';
+    if (filter) {
+      queryContent += filter;
     }
-    return [];
+    if (sort) {
+      if (!filter) {
+        queryContent += `${sort}`;
+      } else {
+        queryContent += `&${sort}`
+      }
+    }
+    const API_URL = `https://api.vandvietnam.com/api/pokemon-api/pokemons${queryContent}`;
+    const res = await this.get(API_URL);
+    // console.log(res.meta, 'res.meta...');
+    const data = res.data as PokemonItem[];
+    const convertedData = await this.useConvertedType(data);
+    return convertedData;
+  }
+
+  async getPokemonItemsTest(queryConfigs: any) {
+    console.log(queryConfigs, 'queryConfigs..');
+    // let queryContent = !filter && !sort ? '' : '?';
+    let queryContent = '';
+    // if (filter) {
+    //   queryContent += filter;
+    // }
+    // if (sort) {
+    //   if (!filter) {
+    //     queryContent += `${sort}`;
+    //   } else {
+    //     queryContent += `&${sort}`
+    //   }
+    // }
+    const API_URL = `https://api.vandvietnam.com/api/pokemon-api/pokemons${queryContent}`;
+    const res = await this.get(API_URL);
+    // console.log(res.meta, 'res.meta...');
+    const data = res.data as PokemonItem[];
+    const convertedData = await this.useConvertedType(data);
+    return convertedData;
   }
 
   async getPokemonByType() {
-    const URL = 'https://api.vandvietnam.com/api/pokemon-api/types';
-    const res = await this.get(URL);
+    const key = 'pokemon-types';
+    const data = await storage.getItem(key);
+    if (data) {
+      return data;
+    }
+    const API_URL = 'https://api.vandvietnam.com/api/pokemon-api/types';
+    const res = await this.get(API_URL);
+    await storage.setItem(key, JSON.stringify(res.data));
+    return res.data;
+  }
+
+  async getPokemonByFilters(filter: string = '', sort: string = '') {
+    let queryContent = !filter && !sort ? '' : '?';
+    if (filter) {
+      queryContent += filter;
+    }
+    if (sort) {
+      if (!filter) {
+        queryContent += `${sort}`;
+      } else {
+        queryContent += `&${sort}`
+      }
+    }
+
+
+    const API_URL = `https://api.vandvietnam.com/api/pokemon-api/pokemons${queryContent}`;
+    const res = await this.get(API_URL);
+    // return res.data;
+    return [];
+  }
+
+  async getPokemonBySorts() {
+    const API_URL = 'https://api.vandvietnam.com/api/pokemon-api/types';
+    const res = await this.get(API_URL);
     return res.data;
   }
 
   async getPokemonDownloadSprite(id: string) {
-    const URL = `https://api.vandvietnam.com/api/pokemon-api/pokemons/${id}/sprite`;
-    const res = await this.get(URL);
-    return res.data;
+    const API_URL = `https://api.vandvietnam.com/api/pokemon-api/pokemons/${id}/sprite`;
+    const res = await this.get(API_URL);
+    return res;
   }
 
   async getPokemonDetails(id: string) {
-    const URL = `https://api.vandvietnam.com/api/pokemon-api/pokemons/${id}`;
-    const res = await this.get(URL);
-    return res.data;
+    const API_URL = `https://api.vandvietnam.com/api/pokemon-api/pokemons/${id}`;
+    const res = await this.get(API_URL);
+    const API_URL_2 = `https://api.vandvietnam.com/api/pokemon-api/pokemons/${id}/sprite`;
+    const src = await getBase64ImageFromUrl(API_URL_2);
+    const details = {
+      ...res.data,
+      src,
+    }
+    return details;
   }
 }

@@ -21,7 +21,6 @@
       :width="width || size"
       :height="height || size"
     >
-      {{ iconPath }}
       <path :d="iconPath"></path>
     </svg>
   </span>

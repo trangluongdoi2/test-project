@@ -10,7 +10,7 @@
         {{ item.field.toUpperCase() }}
       </option>
     </AppSelect>
-    <AppRadioGroup :options="options" @change="setDirection($event as any)"/>
+    <AppRadioGroup :options="options" @change="setOrderSort($event as any)"/>
   </div>
 </template>
 
@@ -51,17 +51,17 @@ export default {
       }
     ]
 
-    const setDirection = (dir: string) => {
+    const setOrderSort = (dir: string) => {
       direction.value = dir as any;
     }
 
-    watch([field, direction], ([newField, newDirection]: [any, any], [oldField, oldDirection]: [any, any]) => {
-      if (newField === oldField && newDirection === oldDirection) {
+    watch([field, direction], ([newField, newOrder]: [any, any], [oldField, oldOrder]: [any, any]) => {
+      if (newField === oldField && newOrder === oldOrder) {
         return;
       }
       emit('change-sort', {
         field: newField,
-        dir: newDirection,
+        orderSort: newOrder,
       })
     })
 
@@ -70,7 +70,7 @@ export default {
       field,
       options,
 
-      setDirection,
+      setOrderSort,
     };
   }
 }
