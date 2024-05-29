@@ -11,7 +11,7 @@
       v-model="filterVal.value" 
       :disabled="!filterVal.enabled" 
       :placeholder="`Search by ${label}`"
-      :type="'number'"
+      :type="field === 'name' ? 'text' : 'number'"
 
       @search="handleSearch"
     />

@@ -57,6 +57,7 @@ export const pokemonTypesMap: { [key: number | string]: string } = {
 };
 
 export const pokemonFilterParamsMap: { [key: number | string ]: string} = {
+  name: 'Name',
  'min_total': 'Min Total',
  'max_total': 'Max Total',
  'min_speed': 'Min Speed',

@@ -1,51 +1,57 @@
 <template>
-  <AppTable
-    class="pokemon-table"
-    :items="items"
-    :headerColumns="headerColumns"
-    :sortField="sortField"
-    @select-item="$emit('select-item', $event)"
-    @sort-table="onSortTable"
-  >
-    <template v-slot:id="{ item }">
-      {{ item.id }}
-    </template>
-    <template v-slot:number="{ item }">
-      {{ item.number }}
-    </template>
-    <template v-slot:created_at="{ item }">
-      {{ item.created_at }}
-    </template>
-    <template v-slot:updated_at="{ item }">
-      {{ item.updated_at }}
-    </template>
-    <template v-slot:total="{ item }">
-      {{ item.total }}
-    </template>
-    <template v-slot:hp="{ item }">
-      {{ item.hp }}
-    </template>
-    <template v-slot:attack="{ item }">
-      {{ item.attack }}
-    </template>
-    <template v-slot:defense="{ item }">
-      {{ item.defense }}
-    </template>
-    <template v-slot:sp_atk="{ item }">
-      {{ item.sp_atk }}
-    </template>
-    <template v-slot:sp_def="{ item }">
-      {{ item.sp_def }}
-    </template>
-    <template v-slot:speed="{ item }">
-      {{ item.speed }}
-    </template>
-  </AppTable>
+  <div class="table-wrapper">
+    <AppTable
+      :items="items"
+      :headerColumns="headerColumns"
+      :sortField="sortField"
+      @select-item="$emit('select-item', $event)"
+      @sort-table="onSortTable"
+    >
+      <template v-slot:id="{ item }">
+        {{ item.id }}
+      </template>
+      <template v-slot:name="{ item }">
+        {{ item.name }}
+      </template>
+      <template v-slot:number="{ item }">
+        {{ item.number }}
+      </template>
+      <template v-slot:created_at="{ item }">
+        {{ item.created_at }}
+      </template>
+      <template v-slot:updated_at="{ item }">
+        {{ item.updated_at }}
+      </template>
+      <template v-slot:total="{ item }">
+        {{ item.total }}
+      </template>
+      <template v-slot:hp="{ item }">
+        {{ item.hp }}
+      </template>
+      <template v-slot:attack="{ item }">
+        {{ item.attack }}
+      </template>
+      <template v-slot:defense="{ item }">
+        {{ item.defense }}
+      </template>
+      <template v-slot:sp_atk="{ item }">
+        {{ item.sp_atk }}
+      </template>
+      <template v-slot:sp_def="{ item }">
+        {{ item.sp_def }}
+      </template>
+      <template v-slot:speed="{ item }">
+        {{ item.speed }}
+      </template>
+    </AppTable>
+  </div>
+  <div class="test-container">
+  </div>
 </template>
 
 <script lang="ts">
 import AppTable, { HeaderColumns, SortField } from '@/components/AppTable.vue';
-import { PropType, SetupContext, ref } from 'vue';
+import { PropType, SetupContext } from 'vue';
 
 export default {
   components: {
@@ -73,6 +79,11 @@ export default {
         field: 'number',
         header: 'Number',
         width: 100,
+        sortable: true,
+      },
+      {
+        field: 'name',
+        header: 'Name',
         sortable: true,
       },
       {
@@ -146,4 +157,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.table-wrapper {
+  overflow: auto;
+  max-height: 100%;
+}
 </style>
