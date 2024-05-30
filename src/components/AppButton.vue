@@ -5,6 +5,8 @@
       'button-container--active': isActive,
       'button-container--disabled': disabled,
       'button-container--loading': loading,
+      'button-container--primary': type === 'primary',
+      'button-container--ghost': type === 'ghost',
     }"
     v-bind="$attrs"
   >
@@ -21,7 +23,6 @@ export type Props = {
   loading?: boolean,
   isActive?: boolean,
   type?: 'ghost' | 'primary' | string;
-  // color?: string,
 }
 export default defineComponent({
   props: {
@@ -36,11 +37,13 @@ export default defineComponent({
     isActive: {
       type: Boolean,
       default: false,
+    },
+    type: {
+      type: String,
+      default: 'primary',
     }
   },
   setup(props: Props) {
-    onMounted(() => {
-    })
   }
 });
 
@@ -69,13 +72,19 @@ export default defineComponent({
     opacity: 0.5;
   }
   &--active {
-    background-color: $green;
+    background-color: $green !important;
   }
   border: 2px solid $green;
   border-radius: 4px;
   background-color: transparent;
   color: $white;
   font-weight: bold;
+  &--primary {
+    background-color: $green;
+  }
+  &--ghost {
+    background-color: transparent;
+  }
   &:hover {
     cursor: pointer;
   }

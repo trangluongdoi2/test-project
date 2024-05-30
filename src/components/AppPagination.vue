@@ -1,8 +1,9 @@
 <template>
   <div class="pagination-container">
-    <app-button class="page" :disabled="currentSelectedPage === 1" @click="selectPrevPage">Prev</app-button>
+    <app-button type="ghost" class="page" :disabled="currentSelectedPage === 1" @click="selectPrevPage">Prev</app-button>
     <app-button
       class="page"
+      type="ghost"
       :isActive="1 === currentSelectedPage"
       @click="selectPage(1)"
     >
@@ -12,6 +13,7 @@
     <div v-for="count in currentPageNumberDisplay" :key="count">
       <app-button
         class="page"
+        type="ghost"
         :isActive="count === currentSelectedPage"
         @click="selectPage(count)"
       >
@@ -21,13 +23,14 @@
     <p class="more" v-if="currentPageNumberDisplay[currentPageNumberDisplay.length - 1] + 1!== totalPagesVal && totalPages !== 1">...</p>
     <app-button
       class="page"
+      type="ghost"
       v-if="totalPagesVal !== 1"
       :isActive="totalPagesVal === currentSelectedPage"
       @click="selectPage(totalPagesVal)"
     >
       {{ totalPagesVal }}
     </app-button>
-    <app-button  class="page" :disabled="currentSelectedPage === totalPagesVal" @click="selectNextPage">Next</app-button>
+    <app-button type="ghost" class="page" :disabled="currentSelectedPage === totalPagesVal" @click="selectNextPage">Next</app-button>
   </div>
 </template>
 
