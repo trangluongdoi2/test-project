@@ -80,7 +80,7 @@ export default {
 
 <style lang="scss" scoped>
 .container-filter {
-  min-height: 40px;
+  min-height: 50px;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -89,13 +89,12 @@ export default {
   padding: 10px;
   border-radius: 4px;
   border: 1px solid #f4f4f4;
-
   .filter-checkbox {
     width: 100px;
     min-height: 20px;
   }
-  .filter-search {
-    flex: 1 1 0;
-  }
+  // .filter-search {
+  //   flex: 1 1 0;
+  // }
 }
 </style>

@@ -1,4 +1,3 @@
-import { PokemonClass } from "@/pokemon/api/type";
 import { ListFieldSort } from "@/type";
 
 export const listFields: ListFieldSort[] = [
@@ -55,6 +54,48 @@ export const pokemonTypesMap: { [key: number | string]: string } = {
   16: 'Steel',
   17: 'Fairy',
 };
+
+export const pokemonColorByTypeMap: { [key: string ]: string} = {
+  'Normal': '#000000',
+  'Fire': '#FF0000',
+  'Water': '#06C6FF',
+  'Grass': '#42d392',
+  'Electric': '#F0CD00',
+  'Ice': '#7DFFDB',
+  'Fighting': '#FF0000',
+  'Poison': 'purple',
+  'Ground': '#785A38',
+  'Flying': '#FAE2C5',
+  'Psychic': '#5BFDBD',
+  'Bug': '#C23131',
+  'Rock': '#858383',
+  'Ghost': '#858383',
+  'Dark': 'black',
+  'Dragon': '#BA00FF',
+  'Steel': '#D8D0DA',
+  'Fairy': '#FF80E2',
+}
+
+export const pokemonIconByTypeMap: { [key: string ]: string} = {
+  'Normal': '#000000',
+  'Fire': '#FF0000',
+  'Water': '#06C6FF',
+  'Grass': '#42d392',
+  'Electric': '#F0CD00',
+  'Ice': '#7DFFDB',
+  'Fighting': '#FF0000',
+  'Poison': '#CB04FF',
+  'Ground': '#785A38',
+  'Flying': '#FAE2C5',
+  'Psychic': '#5BFDBD',
+  'Bug': '#C23131',
+  'Rock': '#858383',
+  'Ghost': '#858383',
+  'Dark': 'black',
+  'Dragon': '#BA00FF',
+  'Steel': '#D8D0DA',
+  'Fairy': '#FF80E2',
+}
 
 export const pokemonFilterParamsMap: { [key: number | string ]: string} = {
   name: 'Name',

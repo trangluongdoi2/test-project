@@ -1,6 +1,6 @@
 <template>
   <div class="pagination-container">
-    <app-button :disabled="currentSelectedPage === 1" @click="selectPrevPage">Prev</app-button>
+    <app-button class="page" :disabled="currentSelectedPage === 1" @click="selectPrevPage">Prev</app-button>
     <app-button
       class="page"
       :isActive="1 === currentSelectedPage"
@@ -8,7 +8,7 @@
     >
       1
     </app-button>
-    <p class="more" v-if="(currentPageNumberDisplay[0] - 1) !== 1">...</p>
+    <p class="more" v-if="(currentPageNumberDisplay[0] - 1) !== 1 && totalPages !== 1">...</p>
     <div v-for="count in currentPageNumberDisplay" :key="count">
       <app-button
         class="page"
@@ -18,15 +18,16 @@
         {{ count }}
       </app-button>
     </div>
-    <p class="more" v-if="currentPageNumberDisplay[currentPageNumberDisplay.length - 1] + 1!== totalPagesVal">...</p>
+    <p class="more" v-if="currentPageNumberDisplay[currentPageNumberDisplay.length - 1] + 1!== totalPagesVal && totalPages !== 1">...</p>
     <app-button
       class="page"
+      v-if="totalPagesVal !== 1"
       :isActive="totalPagesVal === currentSelectedPage"
       @click="selectPage(totalPagesVal)"
     >
       {{ totalPagesVal }}
     </app-button>
-    <app-button :disabled="currentSelectedPage === totalPagesVal" @click="selectNextPage">Next</app-button>
+    <app-button  class="page" :disabled="currentSelectedPage === totalPagesVal" @click="selectNextPage">Next</app-button>
   </div>
 </template>
 
@@ -76,8 +77,6 @@ export default {
       const startIndex = currentSelectedPage.value - 1 - actualExtraPrevPageCount;
       const endIndex = startIndex + props.limitDisplayPage;
       arr = arr.slice(startIndex, endIndex).filter((page: number) => ![1, totalPagesVal.value].includes(page));
-      // arr = arr.slice(startIndex, endIndex);
-      console.log(arr, 'arr..');
       return arr;
     });
 
@@ -119,9 +118,10 @@ export default {
   min-height: 40px;
   .page {
     width: 40px;
+    color: black;
   }
   .more {
-    color: $white;
+    color: black;
     font-weight: bold;
   }
 }

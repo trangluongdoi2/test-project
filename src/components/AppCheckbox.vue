@@ -60,7 +60,7 @@ export default {
 <style lang="scss" scoped>
 .wrapper {
   position: relative;
-  padding-left: 35px;
+  padding-left: 24px;
   cursor: pointer;
   -webkit-user-select: none;
   -moz-user-select: none;

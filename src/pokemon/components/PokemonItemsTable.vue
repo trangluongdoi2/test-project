@@ -161,6 +161,8 @@ export default {
 .table-wrapper {
   overflow: auto;
   max-height: 100%;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-radius: 4px;
   .pokemon-name {
     font-weight: bold;
     font-style: italic;

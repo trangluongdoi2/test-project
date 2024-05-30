@@ -1,14 +1,30 @@
 <template>
   <div class="pokemon-details">
     <div class="pokemon-overview">
-      <div class="">{{ item.type_1 }}</div>
-      <div class="">{{ item.name }}</div>
+      <div class="name">{{ item.name }}</div>
+      <div class="legendary" v-if="isLegendary">
+        <!-- <app-icon name="legendary" /> -->
+      </div>
+      <div class="hp">HP {{ item.hp }}</div>
     </div>
     <div class="pokemon-image">
       <img :src="item.src" loading="lazy"/>
     </div>
     <div class="pokemon-content">
-      <p><strong>HP: </strong>{{ item.hp }}</p>
+      <div class="pokemon-type">
+        <div class="type">
+          <div class="type-icon">
+            <app-icon :name="(item.type_1 as any as string).toLocaleLowerCase()" />
+          </div>
+          <div class="type-text" :style="{ color: colorByType1 }">{{ item.type_1 }}</div>
+        </div>
+        <div v-if="item.type_2" class="type">
+          <div class="type-icon">
+            <app-icon :name="(item.type_2 as any as string).toLocaleLowerCase()" />
+          </div>
+          <div class="type-text" :style="{ color: colorByType2 }">{{ item.type_2 }}</div>
+        </div>
+      </div>
       <p><strong>Attack: </strong>{{ item.attack }}</p>
       <p><strong>Defense: </strong>{{ item.defense }}</p>
       <p><strong>Generation: </strong>{{ item.generation }}</p>
@@ -20,8 +36,13 @@
 </template>
 
 <script lang="ts">
-import { PropType, computed, onMounted } from 'vue';
+import { PropType, computed } from 'vue';
 import { PokemonDetails } from '../api/type';
+import { pokemonColorByTypeMap } from '@/common/constant';
+
+type Props = {
+  item: PokemonDetails,
+}
 
 export default {
   props: {
@@ -30,13 +51,23 @@ export default {
       required: true,
     },
   },
-  setup(props: any) {
-    const colorByType = computed(() => {
-      return 'yellow';
+  setup(props: Props) {
+    const colorByType1 = computed(() => {
+      // @ts-ignore
+      return pokemonColorByTypeMap[props.item.type_1];
     });
 
+    const colorByType2 = computed(() => {
+      // @ts-ignore
+      return pokemonColorByTypeMap?.[props.item.type_2] || 'transparent';
+    });
+
+    const isLegendary = computed(() => props.item.legendary === 1);
+
     return {
-      colorByType,
+      colorByType1,
+      colorByType2,
+      isLegendary,
     }
   }
 }
@@ -46,22 +77,35 @@ export default {
 .pokemon-details {
   width: 300px;
   height: 450px;
-  border: 10px solid v-bind(colorByType);
+  border: 10px solid v-bind(colorByType1);
   border-radius: 10px;
   margin-bottom: 4px;
   display: flex;
   flex-direction: column;
   .pokemon-overview {
     display: flex;
-    flex-direction: row-reverse;
+    padding: 8px;
+    justify-content: space-between;
     gap: 8px;
+    .name {
+      font-size: 20px;
+      font-weight: bold;
+      font-style: italic;
+      margin-left: 4px;
+    }
+    .hp {
+      font-weight: bold;
+      color: red;
+    }
   }
   .pokemon-image {
     width: 100%;
     height: 200px;
-    background-color: green;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+    background: linear-gradient(315deg, #647eff 1%, v-bind(colorByType1) 30%, #647eff);
+    transition: transform 0.4s ease-in-out;
+    &:hover {
+      transform: scale(1.05);
+    }
     > img {
       width: 100%;
       height: 100%;
@@ -69,9 +113,26 @@ export default {
     }
   }
   .pokemon-content {
-    padding-left: 8px;
+    padding: 8px;
     flex: 1 1 0;
     overflow-y: auto;
+    .pokemon-type {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      column-gap: 10px;
+      font-weight: bold;
+      .type {
+        &-text {
+          font-size: 12px;
+        }
+        &-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
   }
 }
 </style>

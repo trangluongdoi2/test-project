@@ -27,12 +27,17 @@ export class PokemonApi extends Api {
     }
   }
 
-  private async useConvertedType(items: PokemonItem[]): Promise<PokemonItem[]> {
+  async getPokemonTypeMaps() {
     const types = await this.getPokemonByType();
     const mapTypes: Map<number, string> = new Map();
     for (let i = 0; i < types.length; i++) {
       mapTypes.set(types[i].id, types[i].name);
     }
+    return mapTypes;
+  }
+
+  private async useConvertedType(items: PokemonItem[]): Promise<PokemonItem[]> {
+    const mapTypes = await this.getPokemonTypeMaps();
     const convertedItems = items.map((item: PokemonItem) => ({
       ...item,
       type_1: mapTypes.has(item?.type_1 as number) ? mapTypes.get(item.type_1 as number) ?? null : null,
@@ -83,9 +88,13 @@ export class PokemonApi extends Api {
     const res = await this.get(API_URL);
     const API_URL_2 = `https://api.vandvietnam.com/api/pokemon-api/pokemons/${id}/sprite`;
     const src = await getBase64ImageFromUrl(API_URL_2);
+    const mapTypes = await this.getPokemonTypeMaps();
+    const data = res.data;
     const details = {
-      ...res.data,
+      ...data,
       src,
+      type_1: mapTypes.has(data?.type_1 as number) ? mapTypes.get(data.type_1 as number) ?? null : null,
+      type_2: mapTypes.has(data?.type_2 as number) ? mapTypes.get(data.type_2 as number) ?? null : null,
     }
     return details;
   }

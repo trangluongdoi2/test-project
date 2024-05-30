@@ -9,8 +9,9 @@ h1.title {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 36px;
+  font-size: 2rem;
   font-weight: bold;
+  // overflow: hidden;
   &::after {
     position: absolute;
     content: '';

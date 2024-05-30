@@ -1,11 +1,17 @@
 <template>
-  <div class="container">
-    <PokemonFilterSidebar 
+  <div class="container" :class="{'container-mobile': isHideFilterSidebar}">
+    <PokemonFilterSidebar
+      v-if="!isHideFilterSidebar"
       @update-filters="updateFilters($event as any)"
       @update-filters-by-search="updateFiltersBySearch($event as any)"
     />
     <div class="pokemon-list__container">
-      <h1 class="title">Pokemon Items Table</h1>
+      <div>
+        <h1 class="title">Pokemon Items Table</h1>
+      </div>
+      <app-button class="filter-button" v-if="isMobileDevice()" @click="showPokemonFilterDrawer">
+        Filter <span><app-icon name="filter" /></span>
+      </app-button>
       <div class="pokemon-config">
         <AppSearch
           v-model="configQuery.pageSize" 
@@ -40,8 +46,8 @@
     v-if="pokemonDetailsVal"
     v-model:visible="isShowPokemonDetailsModal"
     :isLoading="isFetchingPokemonDetails"
-    :width="'50%'"
     :item="pokemonDetailsVal"
+    :width="isMobileDevice() ? '100%' : '50%'"
 
     @download-sprite="onDownloadSprite($event as string)"
   />
@@ -64,10 +70,10 @@ import PokemonItemsTable from '@/pokemon/components/PokemonItemsTable.vue';
 import { pokemonQuery } from '@/pokemon/composables/useQueryPokemon';
 import { QueryConfigs } from '@/type';
 import PokemonFilterSidebar from '@/views/PokemonFilterSidebar.vue';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import AppCheckbox from '@/components/AppCheckbox.vue';
-import useLocalStorage from '@/pokemon/store/useLocalStorage';
 import pokemonApi from '@/pokemon/api';
+import { isMobileDevice } from '@/common/device';
 
 export default {
   components: {
@@ -85,7 +91,6 @@ export default {
     PokemonFilterSidebar,
   },
   setup() {
-    const { storage } = useLocalStorage();
     const {
       useQueryPokemonItems,
       useQueryPokemonDetails,
@@ -95,6 +100,7 @@ export default {
     const sortInfos = ref<string>();
     const idPokemon = ref<string>('');
     const isShowPokemonDetailsModal = ref<boolean>(false);
+    const isShowPokemonFilterDrawer = ref<boolean>(false);
     const pokemonDetails = ref<PokemonDetails>();
     const currentQueryFilters = ref<string>('');
     const currentQueryFiltersBySearch = ref<string>('');
@@ -111,9 +117,12 @@ export default {
       orderSort: 'desc',
     });
     const filterBySearchMap = ref<Map<string, string>>(new Map());
-
     const totalPages = ref<number>(1);
     const metaConfigs = ref<PokemonMetaItem>();
+
+    // const isHideFilterSidebar = computed(() => isMobileDevice());
+
+    const isHideFilterSidebar = ref<boolean>(false);
 
     const {
       data: pokemonItems,
@@ -132,6 +141,10 @@ export default {
 
     const showPokemonDownloadSpriteModal = () => {
       isShowPokemonDetailsModal.value = true;
+    }
+
+    const showPokemonFilterDrawer = () => {
+      isShowPokemonFilterDrawer.value;
     }
 
     const handleSort = (data: SortField) => {
@@ -197,13 +210,23 @@ export default {
       return data as PokemonMetaItem;
     }
 
+    const checkHiddenSidebar = () => {
+      isHideFilterSidebar.value = window.innerWidth <= 768;
+    }
+
     onMounted(() => {
       refetch();
       refetchPokemonTypes();
       getMetaConfigs().then(({ itemPerPage }) => {
         configQuery.value.pageSize = itemPerPage;
       });
+
+      window.addEventListener('resize', checkHiddenSidebar);
     });
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', checkHiddenSidebar);
+    })
 
     watch([currentQueryFilters, currentQueryFiltersBySearch], ([new1, new2]: [string, string]) => {
       entireQueryFilters.value = (new1 ? new1 + '&' : '') + new2;
@@ -236,6 +259,9 @@ export default {
       pokemonFilterParamsMap,
       handlePageSize,
       selectPageNumber,
+      isMobileDevice,
+      isHideFilterSidebar,
+      showPokemonFilterDrawer,
     }
   },
 }
@@ -247,6 +273,10 @@ $side-bar-width: 300px;
   height: 100vh;
   overflow: hidden;
   display: flex;
+  background-color: #f7f8f8;
+  &-mobile {
+    flex-direction: column;
+  }
 }
 .title {
   margin: 10px;
@@ -257,7 +287,7 @@ $side-bar-width: 300px;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background-color: $dark-base-color;
+  background-color: #f7f8f8;
   padding: 10px;
   position: relative;
   .loading {
@@ -281,9 +311,6 @@ $side-bar-width: 300px;
     > .search-wrapper {
       flex: 1;
       height: inherit;
-      // .search-container > input {
-      //   height: 40px !important;
-      // }
     }
   }
   .pokemon-list {
@@ -294,7 +321,9 @@ $side-bar-width: 300px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    
+  }
+  .filter-button {
+    color: black;
   }
 }
 </style>

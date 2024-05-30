@@ -148,21 +148,15 @@
   }
 }
 
-// @media screen and (max-width: 1200px) {
-//   .datatable-custom__header tr > th {
-//     word-break: break-word;
-//   }
-//   .datable-custom__body-row {
-//     .app-dropdown__head {
-//       font-size: 10px;
-//       padding: 0 4px;
-//     }
-//     .app-dropdown__head > svg {
-//       width: 20px;
-//       height: 20px;
-//     }
-//     .table-custom__btn-delete {
-//       font-size: 12px;
-//     }
-//   }
-// }
+@media screen and (max-width: 480px) {
+  .datatable-custom {
+    &__header tr > th:first-child {
+      width: 100px;
+      min-width: 100px;
+      position: sticky;
+      left: 0;
+      background-color: $green;
+      border-right: 1px solid #fafafb;
+    }
+  }
+}

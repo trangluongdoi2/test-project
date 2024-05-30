@@ -40,7 +40,8 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0px 0px 5px 0px #c4c4c4;
+  // box-shadow: 0px 0px 5px 0px #c4c4c4;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
   flex-direction: column;
   overflow-y: auto;
   .filter-search-container {
