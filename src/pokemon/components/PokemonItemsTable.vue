@@ -22,10 +22,10 @@
         {{ item.number }}
       </template>
       <template v-slot:created_at="{ item }">
-        {{ item.created_at }}
+        {{ formatDate(item.created_at) }}
       </template>
       <template v-slot:updated_at="{ item }">
-        {{ item.updated_at }}
+        {{ formatDate(item.updated_at) }}
       </template>
       <template v-slot:total="{ item }">
         {{ item.total }}
@@ -56,6 +56,7 @@
 </template>
 
 <script lang="ts">
+import { formatDate } from '@/common/date';
 import AppLoading from '@/components/AppLoading.vue';
 import AppTable, { HeaderColumns, SortField } from '@/components/AppTable.vue';
 import { PropType, SetupContext } from 'vue';
@@ -162,6 +163,7 @@ export default {
       headerColumns,
 
       onSortTable,
+      formatDate,
     }
   }
 }
