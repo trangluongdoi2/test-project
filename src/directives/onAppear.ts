@@ -2,7 +2,8 @@ import { Directive, DirectiveBinding, VNode } from "vue";
 
 export const onAppear: Directive = {
   beforeMount(element: HTMLElement) {
-    element.style.visibility = 'hidden';
+    // element.style.visibility = 'hidden';
+    element.style.visibility = '';
   },
   updated(
     element: HTMLElement, 

@@ -111,6 +111,7 @@ input[type=number]::-webkit-inner-spin-button {
   background-size: 15px 15px;
   font-size: 16px;
   border: none;
+  padding: 4px;
   &--disabled {
     opacity: 0.8;
     pointer-events: none;

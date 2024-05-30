@@ -84,7 +84,8 @@ export default {
   display: flex;
   gap: 10px;
   align-items: center;
-  justify-content: center;
+  width: 100%;
+  justify-content: space-between;
   background-color: $green;
   padding: 10px;
   border-radius: 4px;
@@ -93,8 +94,5 @@ export default {
     width: 100px;
     min-height: 20px;
   }
-  // .filter-search {
-  //   flex: 1 1 0;
-  // }
 }
 </style>

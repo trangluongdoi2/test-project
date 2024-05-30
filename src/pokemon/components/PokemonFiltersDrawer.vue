@@ -1,5 +1,5 @@
 <template>
-  <AppDrawer :direction="'fade-up'" v-model:visible="visibleVal" >
+  <AppDrawer :direction="direction" v-model="visibleVal" >
     <template v-slot:content>
       <div class="content-container">
         <PokemonFilters class="filter-container" @change-filters="updateFilters"/>
@@ -21,14 +21,18 @@
 </template>
 
 <script lang="ts">
-import AppDrawer from '@/components/AppDrawer.vue';
-import { Props } from '@/components/AppModal.vue';
+import AppDrawer, { Direction } from '@/components/AppDrawer.vue';
 import { useModelWrapper } from '@/composables/useModelWrapper';
-import { SetupContext, ref, watch } from 'vue';
+import { PropType, SetupContext, ref, watch } from 'vue';
 import { pokemonFilterParamsMap } from '@/common/constant';
 import PokemonFilterBySearch from '@/pokemon/components/PokemonFilterBySearch.vue';
 import PokemonFilters from '@/pokemon/components/PokemonFilters.vue';
 import AppButton from '@/components/AppButton.vue';
+
+type Props = {
+  visible: boolean,
+  direction: Direction,
+}
 
 export default {
   emits: ['update-filters', 'update:visible'],
@@ -43,6 +47,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    direction: {
+      type: String as PropType<Direction>,
+      default: 'fade-right',
+    }
   },
   setup(props: Props, { emit }: SetupContext) {
     const visibleVal = useModelWrapper(props, emit, 'visible');
@@ -80,7 +88,6 @@ export default {
 
     watch([currentQueryFilters, currentQueryFiltersBySearch], ([new1, new2]: [string, string]) => {
       entireQueryFilters.value = (new1 ? new1 + '&' : '') + new2;
-      // onSubmitFilters();
     });
 
 

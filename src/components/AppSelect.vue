@@ -38,6 +38,7 @@ export default {
 
 <style lang="scss" scoped>
 .select-container {
+  border-radius: 4px;
   height: 30px;
 }
 </style>

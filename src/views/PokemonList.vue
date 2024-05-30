@@ -55,10 +55,11 @@
     @download-sprite="onDownloadSprite($event as string)"
   />
   <PokemonFiltersDrawer
-    v-if="isMobileView && isShowPokemonFilterDrawer" 
+    v-appear="isMobileView && isShowPokemonFilterDrawer" 
     v-model:visible="isShowPokemonFilterDrawer"
+    direction="fade-left"
     @update-filters="updateFiltersFromDrawer($event as string)"
-    />
+  />
 </template>
 
 <script lang="ts">
