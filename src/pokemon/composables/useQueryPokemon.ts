@@ -1,18 +1,8 @@
 import { useQuery } from "@tanstack/vue-query";
-import PokemonApi from '../api';
-import { Ref, toRef } from "vue";
-
-const pokemonApi = new PokemonApi();
+import pokemonApi from '../api';
+import { Ref } from "vue";
 class PokemonQuery {
-  useQueryPokemonItems = (queryFilter: Ref<string> = toRef(''), querySort: Ref<string> =  toRef('')) => {
-    return useQuery({
-      queryKey: ['pokemons'],
-      queryFn: () => pokemonApi.getPokemonItems(queryFilter.value, querySort.value),
-      enabled: false,
-    });
-  }
-
-  useQueryPokemonItemsTest = (queryConfigs: any) => {
+  useQueryPokemonItems = (queryConfigs: any) => {
     return useQuery({
       queryKey: ['pokemons'],
       queryFn: () => pokemonApi.getPokemonItems(queryConfigs),

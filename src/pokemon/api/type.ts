@@ -17,6 +17,13 @@ export type PokemonItem = {
   updated_at: string,
 }
 
+export type PokemonMetaItem = {
+  currentPage: number,
+  lastPage: number,
+  itemPerPage: number,
+  totalItems: number,
+}
+
 export type PokemonDetails = {
   id: string,
   src?: string,

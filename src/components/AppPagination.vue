@@ -1,38 +1,52 @@
 <template>
   <div class="pagination-container">
-    <app-button :disabled="currenSelectedtPage === 1" @click="selectPrevPage">Prev</app-button>
-    <p class="more" v-if="currentPageNumberDisplay[0] !== 1">...</p>
+    <app-button :disabled="currentSelectedPage === 1" @click="selectPrevPage">Prev</app-button>
+    <app-button
+      class="page"
+      :isActive="1 === currentSelectedPage"
+      @click="selectPage(1)"
+    >
+      1
+    </app-button>
+    <p class="more" v-if="(currentPageNumberDisplay[0] - 1) !== 1">...</p>
     <div v-for="count in currentPageNumberDisplay" :key="count">
       <app-button
         class="page"
-        :isActive="count === currenSelectedtPage"
+        :isActive="count === currentSelectedPage"
         @click="selectPage(count)"
       >
         {{ count }}
       </app-button>
     </div>
-    <p class="more" v-if="currentPageNumberDisplay[currentPageNumberDisplay.length - 1] !== pageNumber">...</p>
-    <app-button :disabled="currenSelectedtPage === pageNumber" @click="selectNextPage">Next</app-button>
+    <p class="more" v-if="currentPageNumberDisplay[currentPageNumberDisplay.length - 1] + 1!== totalPagesVal">...</p>
+    <app-button
+      class="page"
+      :isActive="totalPagesVal === currentSelectedPage"
+      @click="selectPage(totalPagesVal)"
+    >
+      {{ totalPagesVal }}
+    </app-button>
+    <app-button :disabled="currentSelectedPage === totalPagesVal" @click="selectNextPage">Next</app-button>
   </div>
 </template>
 
 <script lang="ts">
-import { SetupContext, computed, ref, watch } from 'vue';
+import { SetupContext, computed, ref } from 'vue';
 
 type Props = {
-  pageNumber: number,
+  totalPages: number,
   itemsPerPage: number,
   limitDisplayPage: number,
 }
 export default {
   props: {
-    pageNumber: {
+    totalPages: {
       type: Number,
-      default: 8,
+      default: 1,
     },
     itemsPerPage: {
       type: Number,
-      default: 300,
+      default: 30,
     },
     limitDisplayPage: {
       type: Number,
@@ -41,61 +55,52 @@ export default {
   },
   emits: ['prev-page', 'next-page', 'select-page'],
   setup(props: Props, { emit }: SetupContext) {
-    const currenSelectedtPage = ref<number>(1);
-    const currentPageNumberDisplay = ref<number[]>([]);
+    const currentSelectedPage = ref<number>(1);
+    const totalPagesVal = computed(() => props.totalPages);
 
     const extraNextPageCount = computed(() => {
       const maxExtraPrevPageCount = Math.ceil(props.limitDisplayPage / 2) - 1;
       return props.limitDisplayPage - maxExtraPrevPageCount - 1;
-    })
+    });
 
-    const updateCurrentPageNumberDisplay = () => {
-      currentPageNumberDisplay.value = new Array(props.pageNumber).fill(null).map((_, index: number) => index + 1);
+    const currentPageNumberDisplay = computed(() => {
+      let arr = new Array(totalPagesVal.value).fill(null).map((_, index: number) => index + 1);
       let maxExtraPrevPageCount = props.limitDisplayPage - 1;
       let actualExtraPrevPageCount = maxExtraPrevPageCount;
 
-      if (currenSelectedtPage.value === 1) {
-        currentPageNumberDisplay.value = currentPageNumberDisplay.value.slice(0, props.limitDisplayPage);
-        return;
-      }
-      if (currenSelectedtPage.value === props.pageNumber) {
-        currentPageNumberDisplay.value = currentPageNumberDisplay.value.slice(-props.limitDisplayPage);
-        return;
-      }
-
-      if (currenSelectedtPage.value - 1 > maxExtraPrevPageCount) {
+      if (currentSelectedPage.value - 1 > maxExtraPrevPageCount) {
         actualExtraPrevPageCount = maxExtraPrevPageCount;
       } else {
-        actualExtraPrevPageCount = Math.max(currenSelectedtPage.value - 1, 0);
+        actualExtraPrevPageCount = Math.max(currentSelectedPage.value - 1, 0);
       }
-      const startIndex = currenSelectedtPage.value - 1 - actualExtraPrevPageCount;
+      const startIndex = currentSelectedPage.value - 1 - actualExtraPrevPageCount;
       const endIndex = startIndex + props.limitDisplayPage;
-      currentPageNumberDisplay.value = currentPageNumberDisplay.value.slice(startIndex, endIndex);
-    }
+      arr = arr.slice(startIndex, endIndex).filter((page: number) => ![1, totalPagesVal.value].includes(page));
+      // arr = arr.slice(startIndex, endIndex);
+      console.log(arr, 'arr..');
+      return arr;
+    });
 
     const selectPrevPage = () => {
-      currenSelectedtPage.value = Math.max(1, currenSelectedtPage.value - 1);
-      emit('select-page', currenSelectedtPage.value);
+      currentSelectedPage.value = Math.max(1, currentSelectedPage.value - 1);
+      emit('select-page', currentSelectedPage.value);
     }
 
     const selectNextPage = () => {
-      currenSelectedtPage.value = Math.min(props.pageNumber, currenSelectedtPage.value + 1);
-      emit('select-page', currenSelectedtPage.value);
+      currentSelectedPage.value = Math.min(props.totalPages, currentSelectedPage.value + 1);
+      emit('select-page', currentSelectedPage.value);
     }
 
     const selectPage = (page: number) => {
-      currenSelectedtPage.value = page;
-      emit('select-page', currenSelectedtPage.value);
+      currentSelectedPage.value = page;
+      emit('select-page', currentSelectedPage.value);
     };
 
-    watch(currenSelectedtPage, () => {
-      updateCurrentPageNumberDisplay();
-    }, { immediate: true });
-
     return {
-      currenSelectedtPage,
+      currentSelectedPage,
       currentPageNumberDisplay,
       extraNextPageCount,
+      totalPagesVal,
 
       selectPage,
       selectPrevPage,
