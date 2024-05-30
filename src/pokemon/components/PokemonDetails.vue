@@ -101,6 +101,9 @@ export default {
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: break-all;
     }
     .hp {
       font-size: 18px;
