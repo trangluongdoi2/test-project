@@ -2,13 +2,14 @@
   <button
     class="button-container"
     :class="{
+      'button-container--active': isActive,
       'button-container--disabled': disabled,
       'button-container--loading': loading,
     }"
     v-bind="$attrs"
   >
-    <slot />
     <app-icon name="loading" class="loading" v-if="loading"></app-icon>
+    <slot />
   </button>
 </template>
 
@@ -18,7 +19,9 @@ import { defineComponent, onMounted } from 'vue';
 export type Props = {
   disabled?: boolean,
   loading?: boolean,
+  isActive?: boolean,
   type?: 'ghost' | 'primary' | string;
+  // color?: string,
 }
 export default defineComponent({
   props: {
@@ -30,6 +33,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    isActive: {
+      type: Boolean,
+      default: false,
+    }
   },
   setup(props: Props) {
     onMounted(() => {
@@ -60,6 +67,17 @@ export default defineComponent({
   &--disabled, &--loading {
     pointer-events: none;
     opacity: 0.5;
+  }
+  &--active {
+    background-color: $green;
+  }
+  border: 2px solid $green;
+  border-radius: 4px;
+  background-color: transparent;
+  color: $white;
+  font-weight: bold;
+  &:hover {
+    cursor: pointer;
   }
   .loading {
     :deep(svg) {

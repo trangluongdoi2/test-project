@@ -15,7 +15,7 @@ class PokemonQuery {
   useQueryPokemonItemsTest = (queryConfigs: any) => {
     return useQuery({
       queryKey: ['pokemons'],
-      queryFn: () => pokemonApi.getPokemonItemsTest(queryConfigs),
+      queryFn: () => pokemonApi.getPokemonItems(queryConfigs),
       enabled: false,
     });
   }

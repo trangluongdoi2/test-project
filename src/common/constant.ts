@@ -73,3 +73,8 @@ export const pokemonFilterParamsMap: { [key: number | string ]: string} = {
  'max_attack': 'Max Attack',
  'min_attack': 'Min Attack',
 }
+
+export const defaultConfigs = {
+  pageNumber: 30,
+  pageSize: 30,
+}

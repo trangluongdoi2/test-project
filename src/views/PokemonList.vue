@@ -5,18 +5,42 @@
       @update-filters-by-search="updateFiltersBySearch($event as any)"
     />
     <div class="pokemon-list__container">
-    <AppLoading class="loading" v-if="isFetching" />
-    <div class="pokemon-list" v-if="pokemonItems?.length">
-      <PokemonItemsTable
-        v-if="pokemonItems?.length" 
-        :items="pokemonItems"
-        :sortField="sortField"
+      <h1 class="title">Pokemon Items Table</h1>
+      <div class="pokemon-config">
+        <AppSearch
+          v-model="configQuery.pageNumber" 
+          placeholder="Enter Page Number"
+          type="number"
+          label="Enter Page Number"
+          :hiddenIcon="true"
+          :defaultValue="1"
 
-        @select-item="onShowDetail($event as any)"
-        @sort-item="handleSort($event as any)"
-      />
-    </div>
-    <div v-else-if="!isFetching && !pokemonItems?.length">No Pokemon</div>
+          @search="handlePageNumber($event as number)"
+        />
+        <AppSearch
+          v-model="configQuery.pageSize" 
+          placeholder="Enter Page Size"
+          type="number"
+          label="Enter Page Size"
+          :hiddenIcon="true"
+          :defaultValue="30"
+
+          @search="handlePageSize($event as number)"
+        />
+      </div>
+      <AppLoading class="loading" v-if="isFetching" />
+      <div class="pokemon-list" v-if="!isFetching && pokemonItems?.length">
+        <PokemonItemsTable
+          v-if="pokemonItems?.length" 
+          :items="pokemonItems"
+          :sortField="sortField"
+
+          @select-item="onShowDetail($event as any)"
+          @sort-item="handleSort($event as any)"
+        />
+        <AppPagination @select-page="selectPageNumber($event as number)"/>
+      </div>
+      <div v-else-if="!isFetching && !pokemonItems?.length">No Pokemon</div>
     </div>
   </div>
   <PokemonDownloadSpriteModal
@@ -34,7 +58,9 @@
 import { pokemonFilterParamsMap } from '@/common/constant';
 import AppLoading from '@/components/AppLoading.vue';
 import AppModal from '@/components/AppModal.vue';
+import AppPagination from '@/components/AppPagination.vue';
 import AppSort from '@/components/AppSort.vue';
+import AppSearch from '@/components/AppSearch.vue';
 import { SortField } from '@/components/AppTable.vue';
 import { PokemonDetails, PokemonItem } from '@/pokemon/api/type';
 import PokemonCard from '@/pokemon/components/PokemonCard.vue';
@@ -43,23 +69,19 @@ import PokemonFilterBySearch from '@/pokemon/components/PokemonFilterBySearch.vu
 import PokemonFilters from '@/pokemon/components/PokemonFilters.vue';
 import PokemonItemsTable from '@/pokemon/components/PokemonItemsTable.vue';
 import { pokemonQuery } from '@/pokemon/composables/useQueryPokemon';
-import { onMounted, ref, watch } from 'vue';
+import { QueryConfigs } from '@/type';
 import PokemonFilterSidebar from '@/views/PokemonFilterSidebar.vue';
-
-export type QueryConfigs = {
-  pageNumber: number | undefined,
-  pageSize: number | undefined,
-  queryFilters: string,
-  querySort: string,
-}
+import { onMounted, ref, watch } from 'vue';
 
 export default {
   components: {
     AppLoading,
     AppModal,
+    AppPagination,
+    AppSort,
+    AppSearch,
     PokemonCard,
     PokemonFilters,
-    AppSort,
     PokemonDownloadSpriteModal,
     PokemonFilterBySearch,
     PokemonItemsTable,
@@ -67,7 +89,6 @@ export default {
   },
   setup() {
     const {
-      useQueryPokemonItems,
       useQueryPokemonItemsTest,
       useQueryPokemonDetails,
       useQueryPokemonDownloadSprite,
@@ -82,8 +103,8 @@ export default {
     const currentQuerySorts = ref<string>('');
     const entireQueryFilters = ref<string>('');
     const configQuery = ref<QueryConfigs>({
-      pageNumber: undefined,
-      pageSize: undefined,
+      pageNumber: 1,
+      pageSize: 30,
       queryFilters: '',
       querySort: '',
     });
@@ -91,18 +112,12 @@ export default {
       field: 'number',
       orderSort: 'desc',
     });
-
     const filterBySearchMap = ref<Map<string, string>>(new Map());
-    
+
     const {
       data: pokemonItems,
       isFetching,
-      refetch
-    } = useQueryPokemonItems(entireQueryFilters, currentQuerySorts);
-
-    const {
-      data: data1,
-      refetch: refetch1,
+      refetch,
     } = useQueryPokemonItemsTest(configQuery);
 
     const {
@@ -111,17 +126,9 @@ export default {
       refetch: refetchPokemonDetails
     }  = useQueryPokemonDetails(idPokemon);
 
-    const {
-      data: pokemonDownloadSprite,
-      isFetching: isFetchingPokemonDownloadSprite,
-      refetch: refetchPokemonDownloadSprite
-    }  = useQueryPokemonDownloadSprite(idPokemon);
+    const { refetch: refetchPokemonDownloadSprite }  = useQueryPokemonDownloadSprite(idPokemon);
 
-    const {
-      data: pokemonTypes,
-      isFetching: isFetchingPokemonTypes,
-      refetch: refetchPokemonTypes,
-    } = useQueryPokemonTypes();
+    const { refetch: refetchPokemonTypes } = useQueryPokemonTypes();
 
     const showPokemonDownloadSpriteModal = () => {
       isShowPokemonDetailsModal.value = true;
@@ -131,6 +138,7 @@ export default {
       sortInfos.value = data.orderSort === 'desc' ? data.field : `-${data.field}`;
       currentQuerySorts.value = `sort=${sortInfos.value}`;
       sortField.value = data;
+      configQuery.value.querySort = currentQuerySorts.value;
     }
 
     const onShowDetail = (data: PokemonItem) => {
@@ -171,22 +179,40 @@ export default {
         dataArr.push(`filter[${key}]=${value}`);
       };
       currentQueryFiltersBySearch.value = dataArr.join('&');
+      // configQuery.value.querySort = currentQueryFiltersBySearch.value;
+    }
+
+    const handlePageNumber = (data: number) => {
+      console.log(data, 'handlePageNumber..');
+      if (data && data > 0) {
+        configQuery.value.pageNumber = Number(data);
+      }
+    }
+
+    const handlePageSize = (data: number) => {
+      console.log(data, 'handlePageSize...');
+      if (data && data > 0) {
+        configQuery.value.pageSize = Number(data);
+      }
+    }
+
+    const selectPageNumber = (data: number) => {
+      console.log(data, 'selectPageNumber...');
     }
 
     onMounted(() => {
-      // getDefaultConfigs();
       refetch();
       refetchPokemonTypes();
     });
 
-
     watch([currentQueryFilters, currentQueryFiltersBySearch], ([new1, new2]: [string, string]) => {
       entireQueryFilters.value = (new1 ? new1 + '&' : '') + new2;
+      configQuery.value.queryFilters = entireQueryFilters.value;
     });
 
-    watch([currentQuerySorts, entireQueryFilters], ([newSorts, newFilters]: [string, string]) => {
+    watch(configQuery, () => {
       refetch();
-    });
+    }, { deep: true })
 
     return {
       isFetching,
@@ -198,6 +224,7 @@ export default {
       isFetchingPokemonDetails,
       pokemonDetailsVal,
       sortField,
+      configQuery,
 
       showPokemonDownloadSpriteModal,
       onShowDetail,
@@ -205,6 +232,9 @@ export default {
       updateFilters,
       updateFiltersBySearch,
       pokemonFilterParamsMap,
+      handlePageNumber,
+      handlePageSize,
+      selectPageNumber,
     }
   },
 }
@@ -221,10 +251,29 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  .pokemon-list {
-    background-color: $dark-base-color;
-    height: 100%;
+  flex-direction: column;
+  background-color: $dark-base-color;
+  padding: 10px;
+  .pokemon-config {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
     padding: 20px;
+    > .search-wrapper {
+      flex: 1;
+      height: inherit;
+    }
+  }
+  .pokemon-list {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     .loading {
       width: 100%;
       height: 100%;
