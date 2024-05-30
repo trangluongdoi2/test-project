@@ -70,50 +70,52 @@ export default {
   top: 0;
   left: 0;
   z-index: 99;
-  background-color: gray;
-}
-.drawer-container {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 99;
-  background-color: gray;
-  .drawer-header {
-    max-height: 30px;
-    height: 30px;
-    .header-actions {
-      height: 100%;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      .button-close {
-        width: 16px;
-        min-height: 16px;
+  .drawer-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    background-color: #f7f8f8;
+    .drawer-header {
+      max-height: 30px;
+      height: 30px;
+      .header-actions {
+        height: 100%;
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        border-radius: 50%;
-        border: none;
+        .button-close {
+          width: 16px;
+          min-height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          border-radius: 50%;
+          border: none;
+          &:hover {
+            cursor: pointer;
+          }
+        }
       }
     }
-  }
-  .drawer-body {
-    flex: 1 1 0;
-  }
-  .drawer-footer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
+    .drawer-body {
+      flex: 1 1 0;
+    }
+    .drawer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
   }
 }
 </style>
