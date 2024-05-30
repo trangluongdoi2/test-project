@@ -34,14 +34,15 @@ export default {
 
 <style lang="scss" scoped>
 .side-bar {
-  width: 300px;
+  width: 360px;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  // box-shadow: 0px 0px 5px 0px #c4c4c4;
+  background-color: $white;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  border-right: 1px solid #c4c4c4;
   flex-direction: column;
   overflow-y: auto;
   .filter-search-container {

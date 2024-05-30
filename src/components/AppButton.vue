@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent } from 'vue';
 
 export type Props = {
   disabled?: boolean,
@@ -73,20 +73,24 @@ export default defineComponent({
   }
   &--active {
     background-color: $green !important;
+    color: $white !important; 
   }
   border: 2px solid $green;
   border-radius: 4px;
   background-color: transparent;
-  color: $white;
   font-weight: bold;
   &--primary {
     background-color: $green;
+    color: $white;
   }
   &--ghost {
     background-color: transparent;
   }
   &:hover {
     cursor: pointer;
+  }
+  &:active {
+    transform: translateY(2px);
   }
   .loading {
     :deep(svg) {

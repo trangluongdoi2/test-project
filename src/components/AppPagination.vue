@@ -9,7 +9,7 @@
     >
       1
     </app-button>
-    <p class="more" v-if="(currentPageNumberDisplay[0] - 1) !== 1 && totalPages !== 1">...</p>
+    <p class="more" v-if="(currentPageNumberDisplay[0] - 1) !== 1 && totalPages !== 1 || limitDisplayPage > totalPages">...</p>
     <div v-for="count in currentPageNumberDisplay" :key="count">
       <app-button
         class="page"
@@ -20,7 +20,14 @@
         {{ count }}
       </app-button>
     </div>
-    <p class="more" v-if="currentPageNumberDisplay[currentPageNumberDisplay.length - 1] + 1!== totalPagesVal && totalPages !== 1">...</p>
+    <p 
+      class="more"
+      v-if="currentPageNumberDisplay[currentPageNumberDisplay.length - 1] + 1!== totalPagesVal
+        && totalPages !== 1
+        || limitDisplayPage > totalPages"
+      >
+      ...
+    </p>
     <app-button
       class="page"
       type="ghost"

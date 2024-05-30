@@ -1,7 +1,7 @@
 <template>
-  <div class="container" :class="{'container-mobile': isHideFilterSidebar}">
+  <div class="container" :class="{'container-mobile': isMobileView}">
     <PokemonFilterSidebar
-      v-if="!isHideFilterSidebar"
+      v-if="!isMobileView"
       @update-filters="updateFilters($event as any)"
       @update-filters-by-search="updateFiltersBySearch($event as any)"
     />
@@ -9,9 +9,11 @@
       <div>
         <h1 class="title">Pokemon Items Table</h1>
       </div>
-      <app-button class="filter-button" v-if="isMobileDevice()" @click="showPokemonFilterDrawer">
-        Filter <span><app-icon name="filter" /></span>
-      </app-button>
+      <div class="filter-button" v-if="isMobileView">
+        <app-button @click="showPokemonFilterDrawer">
+          Filter <span><app-icon name="filter" /></span>
+        </app-button>
+      </div>
       <div class="pokemon-config">
         <AppSearch
           v-model="configQuery.pageSize" 
@@ -47,10 +49,15 @@
     v-model:visible="isShowPokemonDetailsModal"
     :isLoading="isFetchingPokemonDetails"
     :item="pokemonDetailsVal"
-    :width="isMobileDevice() ? '100%' : '50%'"
+    :width="isMobileView ? '100%' : '50%'"
 
     @download-sprite="onDownloadSprite($event as string)"
   />
+  <PokemonFiltersDrawer
+    v-if="isMobileView && isShowPokemonFilterDrawer" 
+    v-model:visible="isShowPokemonFilterDrawer"
+    @update-filters="updateFiltersFromDrawer($event as string)"
+    />
 </template>
 
 <script lang="ts">
@@ -70,10 +77,13 @@ import PokemonItemsTable from '@/pokemon/components/PokemonItemsTable.vue';
 import { pokemonQuery } from '@/pokemon/composables/useQueryPokemon';
 import { QueryConfigs } from '@/type';
 import PokemonFilterSidebar from '@/views/PokemonFilterSidebar.vue';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import AppCheckbox from '@/components/AppCheckbox.vue';
 import pokemonApi from '@/pokemon/api';
 import { isMobileDevice } from '@/common/device';
+import AppDrawer from '@/components/AppDrawer.vue';
+import PokemonFiltersDrawer from '@/pokemon/components/PokemonFiltersDrawer.vue';
+
 
 export default {
   components: {
@@ -83,12 +93,14 @@ export default {
     AppSort,
     AppSearch,
     AppCheckbox,
+    AppDrawer,
     PokemonCard,
     PokemonFilters,
     PokemonDownloadSpriteModal,
     PokemonFilterBySearch,
     PokemonItemsTable,
     PokemonFilterSidebar,
+    PokemonFiltersDrawer,
   },
   setup() {
     const {
@@ -97,7 +109,6 @@ export default {
       useQueryPokemonDownloadSprite,
       useQueryPokemonTypes,
     } = pokemonQuery;
-    const sortInfos = ref<string>();
     const idPokemon = ref<string>('');
     const isShowPokemonDetailsModal = ref<boolean>(false);
     const isShowPokemonFilterDrawer = ref<boolean>(false);
@@ -106,7 +117,11 @@ export default {
     const currentQueryFiltersBySearch = ref<string>('');
     const currentQuerySorts = ref<string>('');
     const entireQueryFilters = ref<string>('');
-    const configQuery = ref<QueryConfigs>({
+    const filterBySearchMap = ref<Map<string, string>>(new Map());
+    const totalPages = ref<number>(1);
+    const metaConfigs = ref<PokemonMetaItem>();
+    const isMobileView = ref<boolean>(false);
+      const configQuery = ref<QueryConfigs>({
       pageNumber: 1,
       pageSize: 30,
       queryFilters: '',
@@ -116,13 +131,6 @@ export default {
       field: 'number',
       orderSort: 'desc',
     });
-    const filterBySearchMap = ref<Map<string, string>>(new Map());
-    const totalPages = ref<number>(1);
-    const metaConfigs = ref<PokemonMetaItem>();
-
-    // const isHideFilterSidebar = computed(() => isMobileDevice());
-
-    const isHideFilterSidebar = ref<boolean>(false);
 
     const {
       data: pokemonItems,
@@ -144,12 +152,11 @@ export default {
     }
 
     const showPokemonFilterDrawer = () => {
-      isShowPokemonFilterDrawer.value;
+      isShowPokemonFilterDrawer.value = true;
     }
 
     const handleSort = (data: SortField) => {
-      sortInfos.value = data.orderSort === 'desc' ? data.field : `-${data.field}`;
-      currentQuerySorts.value = `sort=${sortInfos.value}`;
+      currentQuerySorts.value = `sort=${data.orderSort === 'desc' ? data.field : `-${data.field}`}`;
       sortField.value = data;
       configQuery.value.querySort = currentQuerySorts.value;
     }
@@ -180,7 +187,7 @@ export default {
       currentQueryFilters.value = dataArr.join('&');
     }
 
-    const updateFiltersBySearch = (input: { field: string, data: { enabled: boolean, value: string } }) => {
+    const updateFiltersBySearch = (input: { field: string, data: { enabled: boolean, value: string }}) => {
       const { field, data } = input;
       if (data.enabled && data.value) {
         filterBySearchMap.value.set(field, data.value);
@@ -192,6 +199,10 @@ export default {
         dataArr.push(`filter[${key}]=${value}`);
       };
       currentQueryFiltersBySearch.value = dataArr.join('&');
+    }
+
+    const updateFiltersFromDrawer = (data: string) => {
+      configQuery.value.queryFilters = data;
     }
 
     const handlePageSize = (data: number) => {
@@ -211,7 +222,7 @@ export default {
     }
 
     const checkHiddenSidebar = () => {
-      isHideFilterSidebar.value = window.innerWidth <= 768;
+      isMobileView.value = window.innerWidth <= 768;
     }
 
     onMounted(() => {
@@ -221,6 +232,7 @@ export default {
         configQuery.value.pageSize = itemPerPage;
       });
 
+      checkHiddenSidebar();
       window.addEventListener('resize', checkHiddenSidebar);
     });
 
@@ -243,6 +255,7 @@ export default {
       pokemonItems,
       pokemonDetails,
       isShowPokemonDetailsModal,
+      isShowPokemonFilterDrawer,
       handleSort,
       isFetchingPokemonDetails,
       pokemonDetailsVal,
@@ -260,8 +273,9 @@ export default {
       handlePageSize,
       selectPageNumber,
       isMobileDevice,
-      isHideFilterSidebar,
+      isMobileView,
       showPokemonFilterDrawer,
+      updateFiltersFromDrawer,
     }
   },
 }
@@ -278,9 +292,6 @@ $side-bar-width: 300px;
     flex-direction: column;
   }
 }
-.title {
-  margin: 10px;
-}
 .pokemon-list__container {
   flex: 1 1 0;
   display: flex;
@@ -290,6 +301,9 @@ $side-bar-width: 300px;
   background-color: #f7f8f8;
   padding: 10px;
   position: relative;
+  .title {
+    margin: 10px;
+  }
   .loading {
     position: absolute;
     top: 50%;
@@ -317,13 +331,23 @@ $side-bar-width: 300px;
     height: 100%;
     width: 100%;
     overflow: hidden;
-    padding: 20px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
   .filter-button {
-    color: black;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    border-radius: 4px;
+    padding: 0 10px 0 10px;
+    > button {
+      width: 100%;
+      height: 100%;
+    }
   }
 }
 </style>
