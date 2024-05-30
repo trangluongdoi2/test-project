@@ -26,12 +26,12 @@
           @search="handlePageSize($event as number)"
         />
       </div>
-      <AppLoading class="loading" v-if="isFetching" />
       <div class="pokemon-list" v-if="pokemonItems?.length">
         <PokemonItemsTable
           v-if="pokemonItems?.length" 
           :items="pokemonItems"
           :sortField="sortField"
+          :isFetching="isFetching"
 
           @select-item="onShowDetail($event as any)"
           @sort-item="handleSort($event as any)"
@@ -39,6 +39,7 @@
         <AppPagination
           :totalPages="metaConfigs?.lastPage"
           :itemsPerPage="metaConfigs?.itemPerPage"
+          :isFetching="isFetching"
           @select-page="selectPageNumber($event as number)"/>
       </div>
       <div v-else-if="!isFetching && !pokemonItems?.length">No Pokemon</div>
@@ -80,10 +81,8 @@ import PokemonFilterSidebar from '@/views/PokemonFilterSidebar.vue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import AppCheckbox from '@/components/AppCheckbox.vue';
 import pokemonApi from '@/pokemon/api';
-import { isMobileDevice } from '@/common/device';
 import AppDrawer from '@/components/AppDrawer.vue';
 import PokemonFiltersDrawer from '@/pokemon/components/PokemonFiltersDrawer.vue';
-
 
 export default {
   components: {
@@ -272,7 +271,6 @@ export default {
       pokemonFilterParamsMap,
       handlePageSize,
       selectPageNumber,
-      isMobileDevice,
       isMobileView,
       showPokemonFilterDrawer,
       updateFiltersFromDrawer,
@@ -321,10 +319,11 @@ $side-bar-width: 300px;
     justify-content: center;
     margin: 10px;
     height: 60px;
-    padding: 20px;
+    padding: 10px;
     > .search-wrapper {
-      flex: 1;
       height: inherit;
+      width: 100%;
+      max-width: unset;
     }
   }
   .pokemon-list {

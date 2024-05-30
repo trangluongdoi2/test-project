@@ -3,7 +3,7 @@
     <div class="pokemon-overview">
       <div class="name">{{ item.name }}</div>
       <div class="legendary" v-if="isLegendary">
-        <!-- <app-icon name="legendary" /> -->
+        Legendary
       </div>
       <div class="hp">HP {{ item.hp }}</div>
     </div>
@@ -88,12 +88,22 @@ export default {
     justify-content: space-between;
     gap: 8px;
     .name {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
       font-style: italic;
       margin-left: 4px;
     }
+    .legendary {
+      font-size: 18px;
+      font-weight: bold;
+      margin-left: 4px;
+      background: linear-gradient(315deg, #db1b85 25%, #647eff);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .hp {
+      font-size: 18px;
       font-weight: bold;
       color: red;
     }

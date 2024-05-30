@@ -1,5 +1,5 @@
 <template>
-  <div class="pagination-container">
+  <div class="pagination-container" :class="{'pagination-container--disabled': isFetching}">
     <app-button type="ghost" class="page" :disabled="currentSelectedPage === 1" @click="selectPrevPage">Prev</app-button>
     <app-button
       class="page"
@@ -48,6 +48,7 @@ type Props = {
   totalPages: number,
   itemsPerPage: number,
   limitDisplayPage: number,
+  isFetching?: boolean,
 }
 export default {
   props: {
@@ -62,7 +63,11 @@ export default {
     limitDisplayPage: {
       type: Number,
       default: 3,
-    }
+    },
+    isFetching: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['prev-page', 'next-page', 'select-page'],
   setup(props: Props, { emit }: SetupContext) {
@@ -126,6 +131,10 @@ export default {
   justify-content: center;
   gap: 10px;
   min-height: 40px;
+  &--disabled {
+    opacity: 0.8;
+    pointer-events: none;
+  }
   .page {
     width: 40px;
     color: black;

@@ -1,5 +1,8 @@
 <template>
-  <div class="table-wrapper">
+  <div 
+    class="table-wrapper"
+    :class="{'table-wrapper--fetching': isFetching}"
+  >
     <AppTable
       :items="items"
       :headerColumns="headerColumns"
@@ -48,16 +51,19 @@
         {{ item.speed }}
       </template>
     </AppTable>
+    <AppLoading class="loading" v-if="isFetching" />
   </div>
 </template>
 
 <script lang="ts">
+import AppLoading from '@/components/AppLoading.vue';
 import AppTable, { HeaderColumns, SortField } from '@/components/AppTable.vue';
 import { PropType, SetupContext } from 'vue';
 
 export default {
   components: {
     AppTable,
+    AppLoading,
   },
   props: {
     items: {
@@ -67,6 +73,10 @@ export default {
     sortField: {
       type: Object as PropType<SortField>,
       default: () => undefined,
+    },
+    isFetching: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['sort-item', 'select-item'],
@@ -163,12 +173,24 @@ export default {
   max-height: 100%;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   border-radius: 4px;
+  position: relative;
+  &--fetching {
+    pointer-events: none;
+  }
   .pokemon-name {
     font-weight: bold;
     font-style: italic;
   }
   .pokemon-hp {
     color: red;
+  }
+  .loading {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(black, 0.2);
   }
 }
 </style>

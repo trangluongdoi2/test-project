@@ -70,6 +70,9 @@ export default defineComponent({
   &--disabled, &--loading {
     pointer-events: none;
     opacity: 0.5;
+    &:hover {
+      cursor: not-allowed !important;
+    }
   }
   &--active {
     background-color: $green !important;

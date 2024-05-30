@@ -156,6 +156,7 @@ input[type=number]::-webkit-inner-spin-button {
     font-size: 12px;
     font-weight: bold;
     font-style: italic;
+    min-height: 16px;
   }
 }
 </style>
